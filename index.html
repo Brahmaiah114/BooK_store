@@ -149,7 +149,7 @@
   </style>
 </head>
 <body>
-  <h1>📚 Beautiful Book Store</h1>
+  <h1>Beautiful Book Store</h1>
 
   <div class="controls">
     <input type="text" id="search" placeholder="Search by title" />
@@ -173,12 +173,22 @@
   <div id="booksContainer"></div>
 
   <script>
+    // Replace this URL with your backend URL (local or deployed)
+    //const BASE_URL = 'http://localhost:3000/books';
+    // For deployed backend example:
+    const BASE_URL = 'https://book-store-q6k3.onrender.com';
+
     let books = [];
 
     async function fetchBooks() {
-      const res = await fetch('/books');
-      books = await res.json();
-      renderBooks();
+      try {
+        const res = await fetch(BASE_URL);
+        if (!res.ok) throw new Error('Failed to fetch books');
+        books = await res.json();
+        renderBooks();
+      } catch (error) {
+        alert('Error loading books: ' + error.message);
+      }
     }
 
     function renderBooks() {
@@ -186,7 +196,9 @@
       const searchQuery = document.getElementById('search').value.toLowerCase();
       const sortBy = document.getElementById('sort').value;
 
-      let filteredBooks = books.filter(book => book.title.toLowerCase().includes(searchQuery));
+      let filteredBooks = books.filter(book =>
+        book.title.toLowerCase().includes(searchQuery)
+      );
 
       if (sortBy) {
         filteredBooks.sort((a, b) =>
@@ -218,12 +230,18 @@
     }
 
     async function deleteBook(id) {
-      await fetch(`/books/${id}`, { method: 'DELETE' });
-      fetchBooks();
+      try {
+        const res = await fetch(`${BASE_URL}/${id}`, { method: 'DELETE' });
+        if (!res.ok) throw new Error('Failed to delete book');
+        fetchBooks();
+      } catch (error) {
+        alert('Error deleting book: ' + error.message);
+      }
     }
 
     function editBook(id) {
       const book = books.find(b => b.id === id);
+      if (!book) return;
       document.getElementById('bookId').value = book.id;
       document.getElementById('title').value = book.title;
       document.getElementById('author').value = book.author;
@@ -244,27 +262,33 @@
         coverImageUrl: document.getElementById('coverImageUrl').value
       };
 
-      if (id) {
-        await fetch(`/books/${id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(book)
-        });
-      } else {
-        await fetch('/books', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(book)
-        });
+      try {
+        let res;
+        if (id) {
+          res = await fetch(`${BASE_URL}/${id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(book)
+          });
+        } else {
+          res = await fetch(BASE_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(book)
+          });
+        }
+        if (!res.ok) throw new Error('Failed to save book');
+        e.target.reset();
+        fetchBooks();
+      } catch (error) {
+        alert('Error saving book: ' + error.message);
       }
-
-      e.target.reset();
-      fetchBooks();
     });
 
     document.getElementById('search').addEventListener('input', renderBooks);
     document.getElementById('sort').addEventListener('change', renderBooks);
 
+    // Initial load
     fetchBooks();
   </script>
 </body>
