@@ -5,16 +5,21 @@ const path = require('path');
 const bookRoutes = require('./routes/books');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(bodyParser.json());
 
-// Serve static index.html from project root
-app.use(express.static(path.join(__dirname)));
+// Serve static files (like index.html) from 'public' directory
+app.use(express.static(path.join(__dirname, 'public')));
 
-// API routes for books
+// API routes
 app.use('/books', bookRoutes);
+
+// Catch-all route to serve index.html for any frontend route
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
