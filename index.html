@@ -172,124 +172,125 @@
 
   <div id="booksContainer"></div>
 
-  <script>
-    // Replace this URL with your backend URL (local or deployed)
-    //const BASE_URL = 'http://localhost:3000/books';
-    // For deployed backend example:
-    const BASE_URL = 'https://book-store-q6k3.onrender.com';
+ 
 
-    let books = [];
+<script>
+ 
+  const BASE_URL = 'https://book-store-q6k3.onrender.com/books';
 
-    async function fetchBooks() {
-      try {
-        const res = await fetch(BASE_URL);
-        if (!res.ok) throw new Error('Failed to fetch books');
-        books = await res.json();
-        renderBooks();
-      } catch (error) {
-        alert('Error loading books: ' + error.message);
-      }
+  let books = [];
+
+  async function fetchBooks() {
+    try {
+      const res = await fetch(BASE_URL);
+      if (!res.ok) throw new Error('Failed to fetch books');
+      books = await res.json();
+      renderBooks();
+    } catch (error) {
+      alert('Error loading books: ' + error.message);
     }
+  }
 
-    function renderBooks() {
-      const container = document.getElementById('booksContainer');
-      const searchQuery = document.getElementById('search').value.toLowerCase();
-      const sortBy = document.getElementById('sort').value;
+  function renderBooks() {
+    const container = document.getElementById('booksContainer');
+    const searchQuery = document.getElementById('search').value.toLowerCase();
+    const sortBy = document.getElementById('sort').value;
 
-      let filteredBooks = books.filter(book =>
-        book.title.toLowerCase().includes(searchQuery)
+    let filteredBooks = books.filter(book =>
+      book.title.toLowerCase().includes(searchQuery)
+    );
+
+    if (sortBy) {
+      filteredBooks.sort((a, b) =>
+        sortBy === 'price'
+          ? a.price - b.price
+          : new Date(a.publishedDate) - new Date(b.publishedDate)
       );
-
-      if (sortBy) {
-        filteredBooks.sort((a, b) =>
-          sortBy === 'price'
-            ? a.price - b.price
-            : new Date(a.publishedDate) - new Date(b.publishedDate)
-        );
-      }
-
-      container.innerHTML = '';
-      filteredBooks.forEach(book => {
-        const card = document.createElement('div');
-        card.className = 'book-card';
-        card.innerHTML = `
-          <img src="${book.coverImageUrl}" alt="Cover image of ${book.title}">
-          <div class="book-info">
-            <h2>${book.title}</h2>
-            <p><strong>Author:</strong> ${book.author}</p>
-            <p><strong>Price:</strong> $${book.price}</p>
-            <p><strong>Published:</strong> ${book.publishedDate}</p>
-          </div>
-          <div class="btn-group">
-            <button class="edit-btn" onclick="editBook('${book.id}')">Edit</button>
-            <button class="delete-btn" onclick="deleteBook('${book.id}')">Delete</button>
-          </div>
-        `;
-        container.appendChild(card);
-      });
     }
 
-    async function deleteBook(id) {
-      try {
-        const res = await fetch(`${BASE_URL}/${id}`, { method: 'DELETE' });
-        if (!res.ok) throw new Error('Failed to delete book');
-        fetchBooks();
-      } catch (error) {
-        alert('Error deleting book: ' + error.message);
-      }
-    }
-
-    function editBook(id) {
-      const book = books.find(b => b.id === id);
-      if (!book) return;
-      document.getElementById('bookId').value = book.id;
-      document.getElementById('title').value = book.title;
-      document.getElementById('author').value = book.author;
-      document.getElementById('price').value = book.price;
-      document.getElementById('publishedDate').value = book.publishedDate;
-      document.getElementById('coverImageUrl').value = book.coverImageUrl;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-
-    document.getElementById('bookForm').addEventListener('submit', async e => {
-      e.preventDefault();
-      const id = document.getElementById('bookId').value;
-      const book = {
-        title: document.getElementById('title').value,
-        author: document.getElementById('author').value,
-        price: parseFloat(document.getElementById('price').value),
-        publishedDate: document.getElementById('publishedDate').value,
-        coverImageUrl: document.getElementById('coverImageUrl').value
-      };
-
-      try {
-        let res;
-        if (id) {
-          res = await fetch(`${BASE_URL}/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(book)
-          });
-        } else {
-          res = await fetch(BASE_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(book)
-          });
-        }
-        if (!res.ok) throw new Error('Failed to save book');
-        e.target.reset();
-        fetchBooks();
-      } catch (error) {
-        alert('Error saving book: ' + error.message);
-      }
+    container.innerHTML = '';
+    filteredBooks.forEach(book => {
+      const card = document.createElement('div');
+      card.className = 'book-card';
+      card.innerHTML = `
+        <img src="${book.coverImageUrl}" alt="Cover image of ${book.title}">
+        <div class="book-info">
+          <h2>${book.title}</h2>
+          <p><strong>Author:</strong> ${book.author}</p>
+          <p><strong>Price:</strong> $${book.price}</p>
+          <p><strong>Published:</strong> ${book.publishedDate}</p>
+        </div>
+        <div class="btn-group">
+          <button class="edit-btn" onclick="editBook('${book.id}')">Edit</button>
+          <button class="delete-btn" onclick="deleteBook('${book.id}')">Delete</button>
+        </div>
+      `;
+      container.appendChild(card);
     });
+  }
 
-    document.getElementById('search').addEventListener('input', renderBooks);
-    document.getElementById('sort').addEventListener('change', renderBooks);
+  async function deleteBook(id) {
+    try {
+      const res = await fetch(`${BASE_URL}/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete book');
+      fetchBooks();
+    } catch (error) {
+      alert('Error deleting book: ' + error.message);
+    }
+  }
 
-    // Initial load
-    fetchBooks();
-  </script>
+  function editBook(id) {
+    const book = books.find(b => b.id === id);
+    if (!book) return;
+    document.getElementById('bookId').value = book.id;
+    document.getElementById('title').value = book.title;
+    document.getElementById('author').value = book.author;
+    document.getElementById('price').value = book.price;
+    document.getElementById('publishedDate').value = book.publishedDate;
+    document.getElementById('coverImageUrl').value = book.coverImageUrl;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  document.getElementById('bookForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const id = document.getElementById('bookId').value;
+    const book = {
+      title: document.getElementById('title').value,
+      author: document.getElementById('author').value,
+      price: parseFloat(document.getElementById('price').value),
+      publishedDate: document.getElementById('publishedDate').value,
+      coverImageUrl: document.getElementById('coverImageUrl').value
+    };
+
+    try {
+      let res;
+      if (id) {
+        res = await fetch(`${BASE_URL}/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(book)
+        });
+      } else {
+        res = await fetch(BASE_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(book)
+        });
+      }
+      if (!res.ok) throw new Error('Failed to save book');
+      e.target.reset();
+      fetchBooks();
+    } catch (error) {
+      alert('Error saving book: ' + error.message);
+    }
+  });
+
+  document.getElementById('search').addEventListener('input', renderBooks);
+  document.getElementById('sort').addEventListener('change', renderBooks);
+
+  // Initial load
+  fetchBooks();
+</script>
+
 </body>
 </html>
