@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Beautiful Book Store</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #f2f5f9;
+      padding: 30px;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+
+    .controls input,
+    .controls select {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      width: 200px;
+    }
+
+    #bookForm {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: flex-end;
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+
+    #bookForm input {
+      flex: 1 1 200px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    #bookForm button {
+      padding: 10px 20px;
+      background-color: #2c7be5;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.3s ease;
+    }
+
+    #bookForm button:hover {
+      background-color: #155ab6;
+    }
+
+    #booksContainer {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .book-card {
+      background-color: #fff;
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      transition: transform 0.2s;
+    }
+
+    .book-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .book-card img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    .book-info h2 {
+      font-size: 18px;
+      color: #2c3e50;
+      margin-bottom: 6px;
+    }
+
+    .book-info p {
+      font-size: 14px;
+      color: #666;
+      margin: 2px 0;
+    }
+
+    .btn-group {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+
+    .btn-group button {
+      padding: 6px 12px;
+      font-size: 13px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      flex: 1;
+      margin: 0 4px;
+    }
+
+    .edit-btn {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .edit-btn:hover {
+      background-color: #218838;
+    }
+
+    .delete-btn {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .delete-btn:hover {
+      background-color: #c82333;
+    }
+  </style>
+</head>
+<body>
+  <h1>📚 Beautiful Book Store</h1>
+
+  <div class="controls">
+    <input type="text" id="search" placeholder="Search by title" />
+    <select id="sort">
+      <option value="">Sort By</option>
+      <option value="price">Price</option>
+      <option value="publishedDate">Publish Date</option>
+    </select>
+  </div>
+
+  <form id="bookForm">
+    <input type="hidden" id="bookId">
+    <input type="text" id="title" placeholder="Title" required>
+    <input type="text" id="author" placeholder="Author" required>
+    <input type="number" id="price" placeholder="Price" required>
+    <input type="date" id="publishedDate" required>
+    <input type="url" id="coverImageUrl" placeholder="Cover Image URL" required>
+    <button type="submit">Save Book</button>
+  </form>
+
+  <div id="booksContainer"></div>
+
+  <script>
+    let books = [];
+
+    async function fetchBooks() {
+      const res = await fetch('/books');
+      books = await res.json();
+      renderBooks();
+    }
+
+    function renderBooks() {
+      const container = document.getElementById('booksContainer');
+      const searchQuery = document.getElementById('search').value.toLowerCase();
+      const sortBy = document.getElementById('sort').value;
+
+      let filteredBooks = books.filter(book => book.title.toLowerCase().includes(searchQuery));
+
+      if (sortBy) {
+        filteredBooks.sort((a, b) =>
+          sortBy === 'price'
+            ? a.price - b.price
+            : new Date(a.publishedDate) - new Date(b.publishedDate)
+        );
+      }
+
+      container.innerHTML = '';
+      filteredBooks.forEach(book => {
+        const card = document.createElement('div');
+        card.className = 'book-card';
+        card.innerHTML = `
+          <img src="${book.coverImageUrl}" alt="Cover image of ${book.title}">
+          <div class="book-info">
+            <h2>${book.title}</h2>
+            <p><strong>Author:</strong> ${book.author}</p>
+            <p><strong>Price:</strong> $${book.price}</p>
+            <p><strong>Published:</strong> ${book.publishedDate}</p>
+          </div>
+          <div class="btn-group">
+            <button class="edit-btn" onclick="editBook('${book.id}')">Edit</button>
+            <button class="delete-btn" onclick="deleteBook('${book.id}')">Delete</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    async function deleteBook(id) {
+      await fetch(`/books/${id}`, { method: 'DELETE' });
+      fetchBooks();
+    }
+
+    function editBook(id) {
+      const book = books.find(b => b.id === id);
+      document.getElementById('bookId').value = book.id;
+      document.getElementById('title').value = book.title;
+      document.getElementById('author').value = book.author;
+      document.getElementById('price').value = book.price;
+      document.getElementById('publishedDate').value = book.publishedDate;
+      document.getElementById('coverImageUrl').value = book.coverImageUrl;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    document.getElementById('bookForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const id = document.getElementById('bookId').value;
+      const book = {
+        title: document.getElementById('title').value,
+        author: document.getElementById('author').value,
+        price: parseFloat(document.getElementById('price').value),
+        publishedDate: document.getElementById('publishedDate').value,
+        coverImageUrl: document.getElementById('coverImageUrl').value
+      };
+
+      if (id) {
+        await fetch(`/books/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(book)
+        });
+      } else {
+        await fetch('/books', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(book)
+        });
+      }
+
+      e.target.reset();
+      fetchBooks();
+    });
+
+    document.getElementById('search').addEventListener('input', renderBooks);
+    document.getElementById('sort').addEventListener('change', renderBooks);
+
+    fetchBooks();
+  </script>
+</body>
+</html>

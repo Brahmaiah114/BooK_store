@@ -1,0 +1,74 @@
+[
+  {
+    "id": 1,
+    "title": "Atomic Habits",
+    "author": "James Clear",
+    "price": 450,
+    "publishedDate": "2018-10-16",
+    "coverImageUrl": "https://m.media-amazon.com/images/I/91bYsX41DVL.jpg"
+  },
+  {
+    "id": 2,
+    "title": "The Alchemist",
+    "author": "Paulo Coelho",
+    "price": 299,
+    "publishedDate": "1988-05-01",
+    "coverImageUrl": "https://m.media-amazon.com/images/I/71aFt4+OTOL.jpg"
+  },
+  {
+    "id": 4,
+    "title": "The Psychology of Money",
+    "author": "Morgan Housel",
+    "price": 349,
+    "publishedDate": "2020-09-08",
+    "coverImageUrl": "https://m.media-amazon.com/images/I/71g2ednj0JL.jpg"
+  },
+  {
+    "id": 5,
+    "title": "Can't Hurt Me",
+    "author": "David Goggins",
+    "price": 499,
+    "publishedDate": "2018-11-15",
+    "coverImageUrl": "https://m.media-amazon.com/images/I/81a4kCNuH+L.jpg"
+  },
+  {
+    "id": 6,
+    "title": "Ikigai",
+    "author": "Héctor García & Francesc Miralles",
+    "price": 299,
+    "publishedDate": "2016-09-22",
+    "coverImageUrl": "https://m.media-amazon.com/images/I/71tbalAHYCL.jpg"
+  },
+  {
+    "id": 7,
+    "title": "Sapiens: A Brief History of Humankind",
+    "author": "Yuval Noah Harari",
+    "price": 499,
+    "publishedDate": "2015-02-10",
+    "coverImageUrl": "https://m.media-amazon.com/images/I/713jIoMO3UL.jpg"
+  },
+  {
+    "id": 8,
+    "title": "Rich Dad Poor Dad",
+    "author": "Robert T. Kiyosaki",
+    "price": 350,
+    "publishedDate": "1997-04-01",
+    "coverImageUrl": "https://m.media-amazon.com/images/I/81bsw6fnUiL.jpg"
+  },
+  {
+    "id": 9,
+    "title": "1984",
+    "author": "George Orwell",
+    "price": 199,
+    "publishedDate": "1949-06-08",
+    "coverImageUrl": "https://m.media-amazon.com/images/I/71kxa1-0mfL.jpg"
+  },
+  {
+    "id": 10,
+    "title": "Think and Grow Rich",
+    "author": "Napoleon Hill",
+    "price": 275,
+    "publishedDate": "1937-01-01",
+    "coverImageUrl": "https://m.media-amazon.com/images/I/71UypkUjStL.jpg"
+  }
+]
